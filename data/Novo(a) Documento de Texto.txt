@@ -1,30 +1,29 @@
 import pygame
-import random
-from menu import show_menu
 from player import Player
 from enemies import Enemies
 from shot import Shot
+import random
 
-# Initializing pygame and creating the window
-pygame.init()
-display = pygame.display.set_mode([840, 480])
-pygame.display.set_caption("My Game")
-
-# Groups
-objectGroup = pygame.sprite.Group()
-enemiesGroup = pygame.sprite.Group()
-shotGroup = pygame.sprite.Group()
-
-# music
-pygame.mixer.music.load("data/music.mp3")
-pygame.mixer.music.play(-1)
-
-# sounds
-shot = pygame.mixer.Sound("data/shot.wav")
-
-
+# Função para rodar o jogo
 def game_loop():
+    pygame.init()
+    display = pygame.display.set_mode([840, 480])
+    pygame.display.set_caption("My Game")
+
+    # Groups
+    objectGroup = pygame.sprite.Group()
+    enemiesGroup = pygame.sprite.Group()
+    shotGroup = pygame.sprite.Group()
+
     player = Player(objectGroup)
+
+    # music
+    pygame.mixer.music.load("data/music.mp3")
+    pygame.mixer.music.play(-1)
+
+    # sounds
+    shot = pygame.mixer.Sound("data/shot.wav")
+
     gameloop = True
     gameover = False
     timer = 20
@@ -64,8 +63,4 @@ def game_loop():
         objectGroup.draw(display)
         pygame.display.update()
 
-
-if __name__ == "__main__":
-    action = show_menu()  # Display the menu
-    if action == "start":
-        game_loop()  # Start the game if the user presses "Start"
+    pygame.quit()
