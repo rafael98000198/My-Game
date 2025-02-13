@@ -1,40 +1,64 @@
 import pygame
+from player import Player
+from enemies import Enemies
+from shot import Shot
+
+import random
 
 # Initializing pygame and creating the window
 pygame.init()
 display = pygame.display.set_mode([840, 480])
 pygame.display.set_caption("My Game")
 
-#
-drawGroup = pygame.sprite.Group()
+# Groups
+objectGroup = pygame.sprite.Group()
+enemiesGroup = pygame.sprite.Group()
+shotGroup = pygame.sprite.Group()
 
-guy = pygame.sprite.Sprite(drawGroup)
-guy.image = pygame.image.load("data/TestGuy.png")
-guy.image = pygame.transform.scale(guy.image, [100, 100])
-guy.rect = pygame.Rect(50, 50, 100, 100)
+player = Player(objectGroup)
 
+# music
+pygame.mixer.music.load("data/music.mp3")
+pygame.mixer.music.play(-1)
+
+# sounds
+shot = pygame.mixer.Sound("data/shot.wav")
 
 gameloop = True
+gameover = False
+timer = 20
+clock = pygame.time.Clock()
 if __name__ == "__main__":
     while gameloop:
+        clock.tick(60)
+
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 gameloop = False
+            elif event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_SPACE and not gameover:
+                    shot.play()
+                    newShot = Shot(objectGroup, shotGroup)
+                    newShot.rect.center = player.rect.center
 
-        keys = pygame.key.get_pressed()
+        if not gameover:
+            objectGroup.update()
 
-        if keys[pygame.K_a]:
-            guy.rect.x -= 1
+            timer += 1
+            if timer > 30:
+                timer = 0
+                if random.random() < 0.3:
+                    newEnemies = Enemies(objectGroup, enemiesGroup)
+                    print("new enemies")
 
-        if keys[pygame.K_d]:
-            guy.rect.x += 1
+            collisions = pygame.sprite.spritecollide(player, enemiesGroup, False)
 
-        # draw()
+            if collisions:
+                print("Game Over")
+                gameover = True
+
+            hits = pygame.sprite.groupcollide(shotGroup, enemiesGroup, True, True)
+
         display.fill([46, 46, 46])
-
-        drawGroup.draw(display)
-
-        # player = pygame.Rect(50, 50, 100, 100)
-        # pygame.draw.rect(display, [255, 255, 255, 255], player)
-
+        objectGroup.draw(display)
         pygame.display.update()
